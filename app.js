@@ -4,9 +4,13 @@ var http = require('http');
 var bodyParser = require('body-parser');
 var cors = require('cors');
 var session = require('express-session');
+var errorhandler = require('errorhandler');
 var methods = require('methods');
 var mongoose = require('mongoose');
+var passport = require('passport');
 var key = require('./env-config.js');
+
+var isProduction = process.env.NODE_ENV === 'production';
 
 var app = express();
 
@@ -20,7 +24,7 @@ app.use(bodyParser.json());
 app.use(require('method-override')());
 app.use(express.static(__dirname + '/dist'));
 
-app.use(session({ secret: 'conduit', cookie: { maxAge: 60000 }, resave: false, saveUninitialized: false  }));
+app.use(session({ secret: 'pickup', cookie: { maxAge: 60000 }, resave: false, saveUninitialized: false  }));
 
 if (!isProduction) {
   app.use(errorhandler());
@@ -33,6 +37,7 @@ if(isProduction){
   mongoose.set('debug', true);
 }
 
+require('./models/User');
 require('./config/passport');
 app.use(require('./routes'));
 
