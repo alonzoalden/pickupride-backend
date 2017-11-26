@@ -1,3 +1,6 @@
+# API Keys
+env-config
+
 # Logs
 logs
 *.log
@@ -27,9 +30,6 @@ build/Release
 
 # Dependency directory
 node_modules
-
-# API Keys
-env-config
 
 # Optional npm cache directory
 .npm
