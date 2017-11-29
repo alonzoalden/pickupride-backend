@@ -1,15 +1,5 @@
 var mongoose = require('mongoose');
 var router = require('express').Router();
-
-router.get('/user', function(req, res, next){
-    console.log(req, res, next);
-    res.json('hello');
-}); 
-
-module.exports = router;
-
-var mongoose = require('mongoose');
-var router = require('express').Router();
 var passport = require('passport');
 var User = mongoose.model('User');
 var auth = require('../auth');
