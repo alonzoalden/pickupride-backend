@@ -3,8 +3,10 @@ var router = require('express').Router();
 var passport = require('passport');
 var User = mongoose.model('User');
 var auth = require('../auth');
+var axios = require('axios');
 
 router.get('/user', auth.required, function(req, res, next){
+
   User.findById(req.payload.id).then(function(user){
     if(!user){ return res.sendStatus(401); }
 
@@ -60,16 +62,37 @@ router.post('/users/login', function(req, res, next){
   })(req, res, next);
 });
 
-router.post('/users', function(req, res, next){
-  var user = new User();
+//register new user
+router.post('/users/register', function(req, res, next){
 
-  user.username = req.body.user.username;
-  user.email = req.body.user.email;
-  user.setPassword(req.body.user.password);
+  const userInfo = {
+    client_id: req.body.user.clientId,
+    client_secret: req.body.user.clientSecret,
+    code: req.body.user.accessCode
+  };
 
-  user.save().then(function(){
-    return res.json({user: user.toAuthJSON()});
-  }).catch(next);
+  axios.post('https://www.strava.com/oauth/token', userInfo)
+      .then((success)=> {
+        let user = new User();
+
+        user.token = success.token;
+        user.name = success.name;
+
+        //save into db and respond to client with info
+        user.save()
+          .then(() => res.json({user: user.toAuthJSON()}))
+          .catch(next);
+
+      })
+      .catch((error)=> {
+        console.log(error);
+      });
+
+
+  //create HTTPrequest to strava with: accessCode, clientiD, secret
+  //on success:
+  //  return strava access token + info to client
+  //  save information into database
 });
 
 module.exports = router;

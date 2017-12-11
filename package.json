@@ -4,8 +4,8 @@
   "description": "Node, MongoDB backend for Pickup Ride App",
   "main": "app.js",
   "scripts": {
-    "start": "node ./app.js",
-    "dev": "nodemon ./app.js"
+    "start": "node ./index.js",
+    "dev": "nodemon ./index.js"
   },
   "repository": {
     "type": "git",
@@ -14,6 +14,8 @@
   "author": "Alonzo Alden",
   "license": "MIT",
   "dependencies": {
+    "axios": "^0.17.1",
+    "babel-register": "^6.26.0",
     "body-parser": "1.15.0",
     "cors": "2.7.1",
     "ejs": "2.4.1",

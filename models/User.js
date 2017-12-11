@@ -22,6 +22,7 @@ UserSchema.methods.validPassword = function(password) {
   return this.hash === hash;
 };
 
+//currently no password needed for app
 UserSchema.methods.setPassword = function(password){
   this.salt = crypto.randomBytes(16).toString('hex');
   this.hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex');
