@@ -1,18 +1,19 @@
-var express = require('express');
-var path = require('path');
-var http = require('http');
-var bodyParser = require('body-parser');
-var cors = require('cors');
-var session = require('express-session');
-var errorhandler = require('errorhandler');
-var methods = require('methods');
-var mongoose = require('mongoose');
-var passport = require('passport');
-var key = require('./env-config.js');
+const express = require('express');
+const path = require('path');
+const http = require('http');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const session = require('express-session');
+const errorhandler = require('errorhandler');
+const methods = require('methods');
+const mongoose = require('mongoose');
+const passport = require('passport');
+const jwtCheck = require('./routes/auth');
+const key = require('./env-config.js');
 
-var isProduction = process.env.NODE_ENV === 'production';
+const isProduction = process.env.NODE_ENV === 'production';
 
-var app = express();
+const app = express();
 
 app.use(cors());
 
@@ -25,6 +26,11 @@ app.use(require('method-override')());
 app.use(express.static(__dirname + '/dist'));
 
 app.use(session({ secret: 'pickup', cookie: { maxAge: 60000 }, resave: false, saveUninitialized: false  }));
+
+//app.use(jwtCheck);
+// app.get('/authorized', function (req, res) {
+//   res.send('Secured Resource');
+// });
 
 if (!isProduction) {
   app.use(errorhandler());

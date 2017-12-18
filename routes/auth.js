@@ -1,5 +1,7 @@
-var jwt = require('express-jwt');
-var secret = require('../config').secret;
+const key = require('../env-config.js');
+const jwt = require('express-jwt');
+const jwks = require('jwks-rsa');
+const secret = require('../config').secret;
 
 function getTokenFromHeader(req){
   if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Token' ||
@@ -24,4 +26,16 @@ var auth = {
   })
 };
 
-module.exports = auth;
+var jwtCheck = jwt({
+    secret: jwks.expressJwtSecret({
+        cache: true,
+        rateLimit: true,
+        jwksRequestsPerMinute: 5,
+        jwksUri: "https://alonzoalden.auth0.com/.well-known/jwks.json"
+    }),
+    audience: 'http://localhost:3000/api/',
+    issuer: "https://alonzoalden.auth0.com/",
+    algorithms: ['RS256']
+});
+
+module.exports = jwtCheck;

@@ -5,7 +5,7 @@ var User = mongoose.model('User');
 var auth = require('../auth');
 var axios = require('axios');
 
-router.get('/user', auth.required, function(req, res, next){
+router.get('/user', auth, function(req, res, next){
 
   User.findById(req.payload.id).then(function(user){
     if(!user){ return res.sendStatus(401); }
@@ -14,7 +14,7 @@ router.get('/user', auth.required, function(req, res, next){
   }).catch(next);
 });
 
-router.put('/user', auth.required, function(req, res, next){
+router.put('/user', auth, function(req, res, next){
   User.findById(req.payload.id).then(function(user){
     if(!user){ return res.sendStatus(401); }
 
@@ -93,6 +93,7 @@ router.post('/users/register', function(req, res, next){
   //on success:
   //  return strava access token + info to client
   //  save information into database
+
 });
 
 module.exports = router;
