@@ -5,7 +5,15 @@ var User = mongoose.model('User');
 var auth = require('../auth');
 var axios = require('axios');
 
-router.get('/user', auth, function(req, res, next){
+router.get('/user/:id', auth, function(req, res, next){
+
+//using params.id:
+//make call to auth0 to get information (email, name) 
+//  if no user exists in our database, return empty object
+
+//the client will then get this notifcation and execute the strava oauth.
+//this execution will go to users/register
+
 
   User.findById(req.payload.id).then(function(user){
     if(!user){ return res.sendStatus(401); }
@@ -65,6 +73,9 @@ router.post('/users/login', function(req, res, next){
 //register new user
 router.post('/users/register', function(req, res, next){
 
+//also get auth0 information 
+
+
   const userInfo = {
     client_id: req.body.user.clientId,
     client_secret: req.body.user.clientSecret,
@@ -95,5 +106,6 @@ router.post('/users/register', function(req, res, next){
   //  save information into database
 
 });
+
 
 module.exports = router;

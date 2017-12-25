@@ -25,9 +25,9 @@ app.use(bodyParser.json());
 app.use(require('method-override')());
 app.use(express.static(__dirname + '/dist'));
 
-app.use(session({ secret: 'pickup', cookie: { maxAge: 60000 }, resave: false, saveUninitialized: false  }));
+//app.use(session({ secret: 'pickup', cookie: { maxAge: 60000 }, resave: false, saveUninitialized: false  }));
 
-//app.use(jwtCheck);
+app.use(jwtCheck);
 // app.get('/authorized', function (req, res) {
 //   res.send('Secured Resource');
 // });

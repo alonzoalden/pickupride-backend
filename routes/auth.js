@@ -33,7 +33,7 @@ var jwtCheck = jwt({
         jwksRequestsPerMinute: 5,
         jwksUri: "https://alonzoalden.auth0.com/.well-known/jwks.json"
     }),
-    audience: 'http://localhost:3000/api/',
+    aud: "http://localhost:3000/api/",
     issuer: "https://alonzoalden.auth0.com/",
     algorithms: ['RS256']
 });
