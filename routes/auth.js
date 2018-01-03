@@ -2,7 +2,6 @@ const key = require('../env-config.js');
 const jwt = require('express-jwt');
 const jwks = require('jwks-rsa');
 const secret = require('../config').secret;
-
 // function getTokenFromHeader(req){
 //   if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Token' ||
 //       req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {

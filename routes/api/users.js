@@ -4,22 +4,29 @@ var passport = require('passport');
 var User = mongoose.model('User');
 var auth = require('../auth');
 var axios = require('axios');
+var http = require('../../agent.js');
+var keys = require('../../env-config.js');
 
-router.get('/user/:id', auth, function(req, res, next){
+router.get('/user/:accessToken', auth, function(req, res, next){
 
 //using params.id:
 //make call to auth0 to get information (email, name) 
 //  if no user exists in our database, return empty object
 
+http.setToken(req.params.accessToken);
+http.requests.get(`${keys.AUTH0_DOMAIN}/userinfo`).then((response) => {
+  return res.json({user: response});
+});
+
 //the client will then get this notifcation and execute the strava oauth.
 //this execution will go to users/register
 
 
-  User.findById(req.payload.id).then(function(user){
-    if(!user){ return res.sendStatus(401); }
+  // User.findById(req.payload.id).then(function(user){
+  //   if(!user){ return res.sendStatus(401); }
 
-    return res.json({user: user.toAuthJSON()});
-  }).catch(next);
+  //   return res.json({user: user.toAuthJSON()});
+  // }).catch(next);
 });
 
 router.put('/user', auth, function(req, res, next){

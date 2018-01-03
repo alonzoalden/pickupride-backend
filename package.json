@@ -35,6 +35,8 @@
     "passport-local": "1.0.0",
     "request": "2.69.0",
     "slug": "0.9.1",
+    "superagent": "^3.8.2",
+    "superagent-promise": "^1.1.0",
     "underscore": "1.8.3"
   },
   "devDependencies": {

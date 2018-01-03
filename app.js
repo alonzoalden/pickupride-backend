@@ -10,7 +10,8 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const jwtCheck = require('./routes/auth');
 const key = require('./env-config.js');
-
+const requests = require('./agent.js').requests;
+const setToken = require('./agent.js').setToken;
 const isProduction = process.env.NODE_ENV === 'production';
 
 const app = express();
