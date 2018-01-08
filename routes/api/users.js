@@ -11,22 +11,16 @@ router.get('/user/:accessToken', auth, function(req, res, next){
 
 //using params.id:
 //make call to auth0 to get information (email, name) 
-//  if no user exists in our database, return empty object
+//  if no user exists in our database, return null
 
-http.setToken(req.params.accessToken);
-http.requests.get(`${keys.AUTH0_DOMAIN}/userinfo`).then((response) => {
-  return res.json({user: response});
-});
+  http.setToken(req.params.accessToken);
+  http.requests.get(`${keys.AUTH0_DOMAIN}/userinfo`).then((response) => {
 
-//the client will then get this notifcation and execute the strava oauth.
-//this execution will go to users/register
-
-
-  // User.findById(req.payload.id).then(function(user){
-  //   if(!user){ return res.sendStatus(401); }
-
-  //   return res.json({user: user.toAuthJSON()});
-  // }).catch(next);
+    User.findOne({ 'auth_email': response.email }, function (err, person) {
+      if (err) return handleError(err);
+      return res.json({user: person});
+    });
+  });
 });
 
 router.put('/user', auth, function(req, res, next){
@@ -78,28 +72,43 @@ router.post('/users/login', function(req, res, next){
 });
 
 //register new user
-router.post('/users/register', function(req, res, next){
-
-//also get auth0 information 
-
+router.post('/user/register', function(req, res, next){
 
   const userInfo = {
-    client_id: req.body.user.clientId,
-    client_secret: req.body.user.clientSecret,
-    code: req.body.user.accessCode
+    client_id: keys.STRAVA_CLIENT_ID,
+    client_secret: keys.STRAVA_CLIENT_SECRET,
+    code: req.body.code,
   };
 
-  axios.post('https://www.strava.com/oauth/token', userInfo)
-      .then((success)=> {
-        let user = new User();
+  http.requests.post('https://www.strava.com/oauth/token', userInfo)
+      .then((stravaResponse)=> {
+          http.setToken(req.body.accessToken);
+          http.requests.get(`${keys.AUTH0_DOMAIN}/userinfo`)
+              .then((authResponse) => {
+                  let user = new User();
+                  
+                  user.access_token = stravaResponse.access_token;
+                  user.strava_email = stravaResponse.athlete.email;
+                  user.auth_email = authResponse.email;
+                  user.id = stravaResponse.athlete.id;
+                  user.firstname = stravaResponse.athlete.firstname;
+                  user.lastname = stravaResponse.athlete.lastname;
+                  user.profile_medium = stravaResponse.athlete.profile_medium;
+                  user.profile = stravaResponse.athlete.profile;
+                  user.city = stravaResponse.athlete.city;
+                  user.state = stravaResponse.athlete.state;
+                  user.country = stravaResponse.athlete.country;
+                  user.sex = stravaResponse.athlete.sex;
+                  user.created_at = stravaResponse.athlete.created_at;
+                  user.updated_at = stravaResponse.athlete.updated_at;
 
-        user.token = success.token;
-        user.name = success.name;
+                  res.json({user: user});
+              });
 
-        //save into db and respond to client with info
-        user.save()
-          .then(() => res.json({user: user.toAuthJSON()}))
-          .catch(next);
+                  //save into db and respond to client with info
+                  // user.save()
+                  //   .then(() => res.json({user: user.toAuthJSON()}))
+                  //   .catch(next);
 
       })
       .catch((error)=> {

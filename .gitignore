@@ -1,6 +1,8 @@
 # API Keys
 env-config.js
 
+.vscode
+
 # Logs
 logs
 *.log
