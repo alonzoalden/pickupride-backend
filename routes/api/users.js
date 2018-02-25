@@ -7,6 +7,14 @@ var axios = require('axios');
 var http = require('../../agent.js');
 var keys = require('../../env-config.js');
 const _ = require('underscore');
+const polyline = require('polyline');
+ 
+// returns an array of lat, lon pairs 
+// polyline.decode('_p~iF~ps|U_ulLnnqC_mqNvxq`@');
+ 
+// // returns a string-encoded polyline 
+//polyline.encode([[38.5, -120.2], [40.7, -120.95], [43.252, -126.453]]);
+ 
 
 //retrieve user info
 router.get('/user/:authAccessToken', auth, function(req, res, next){
@@ -28,16 +36,12 @@ router.get('/user/routes/:id', auth, function(req, res, next) {
 		http.setToken(person.access_token);
  		http.requests.get(`https://www.strava.com/api/v3/athletes/${person.strava_id}/routes`)
 		 	.then((routesResponse) => {
-				 http.requests.get(`https://maps.googleapis.com/maps/api/js?key=${keys.GOOGLE_MAPS_KEY}&libraries=geometry&callback=initMap`)
-					.then((response)=> {
-						console.log(response);
-						// function initMap() {
-						// 	var maps = google.maps.geometry.encoding.decodePath(routesResponse[0].summary_polyline);
-						// 	return res.json({user: maps});	
-						// }
-					})
-		});
-  });
+				 routesResponse.forEach(function(route){
+					 route.map.polyline = polyline.decode(route.map.summary_polyline);
+				 })
+				res.json({routes: routesResponse});
+			});
+  	});
 });
 
 //register new user
