@@ -22,7 +22,7 @@ router.get('/user/:authAccessToken', auth, function(req, res, next){
 	http.requests.get(`${keys.AUTH0_DOMAIN}/userinfo`)
 		.then((response) => {
 			User.findOne({ 'auth_email': response.email }, function (err, person) {
-				if (err) return handleError(err);
+				if (err) return console.log(err);
 				return res.json({user: person});
 			});
   		});
@@ -32,13 +32,14 @@ router.get('/user/:authAccessToken', auth, function(req, res, next){
 router.get('/user/routes/:id', auth, function(req, res, next) {
 
 	User.findById(req.params.id, function (err, person) {
-		if (err) return handleError(err);
+		if (err) return console.log(err);
 		http.setToken(person.access_token);
  		http.requests.get(`https://www.strava.com/api/v3/athletes/${person.strava_id}/routes`)
 		 	.then((routesResponse) => {
-				 routesResponse.forEach(function(route){
-					 route.map.polyline = polyline.decode(route.map.summary_polyline);
-				 })
+				// routesResponse.forEach(function(route){
+				// 	route.map.polyline = polyline.decode(route.map.summary_polyline);
+				// });
+
 				res.json({routes: routesResponse});
 			});
   	});
@@ -55,11 +56,17 @@ router.post('/user/register', function(req, res, next) {
 
 	http.requests.post('https://www.strava.com/oauth/token', userInfo)
 		.then((stravaResponse)=> {
+			if (!!stravaResponse.athlete.email) {
+				const tempUserInfo = {
+					firstname: authResponse.email
+				}
+				return res.json({user: tempUserInfo});
+			}
+
 			http.setToken(req.body.accessToken);
 			http.requests.get(`${keys.AUTH0_DOMAIN}/userinfo`)
 				.then((authResponse) => {
 					let user = new User();
-
 					user.access_token = stravaResponse.access_token;
 					user.strava_email = stravaResponse.athlete.email;
 					user.auth_email = authResponse.email;
@@ -78,7 +85,7 @@ router.post('/user/register', function(req, res, next) {
 					user.save()
 						.then(() => {
 							delete user.access_token;
-							res.json({user: user.user});
+							res.json({user: user.toObject()});
                     	})
                     .catch(next);
 				});

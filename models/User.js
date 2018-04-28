@@ -5,12 +5,12 @@ var jwt = require('jsonwebtoken');
 var secret = require('../config').secret;
 
 var UserSchema = new mongoose.Schema({
-	access_token: {type: String, required: [true, "can't be blank"], index: true},
-	strava_id: {type: String, required: [true, "can't be blank"], index: true},
-	firstname: {type: String, match: [/^[a-zA-Z0-9]+$/, 'is invalid'], index: true},
-	lastname: {type: String,  match: [/^[a-zA-Z0-9]+$/, 'is invalid'], index: true},
-	auth_email: {type: String, lowercase: true, unique: true, required: [true, "can't be blank"], match: [/\S+@\S+\.\S+/, 'is invalid'], index: true},
-	strava_email: {type: String, lowercase: true, unique: true, required: [true, "can't be blank"], match: [/\S+@\S+\.\S+/, 'is invalid'], index: true},
+	access_token: {type: String, required: [true, "can't be blank"]},
+	strava_id: {type: String, required: [true, "can't be blank"]},
+	firstname: {type: String, match: [/^[a-zA-Z0-9]+$/, 'is invalid']},
+	lastname: {type: String,  match: [/^[a-zA-Z0-9]+$/, 'is invalid']},
+	auth_email: {type: String, lowercase: true, required: [true, "can't be blank"], match: [/\S+@\S+\.\S+/, 'is invalid']},
+	strava_email: {type: String, lowercase: true, required: [true, "can't be blank"], match: [/\S+@\S+\.\S+/, 'is invalid']},
 	profile_medium: String,
 	profile: String,
 	sex: String,

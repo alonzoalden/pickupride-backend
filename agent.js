@@ -26,7 +26,6 @@ const requests = {
 		superagent.post(`${url}`, body).use(tokenPlugin).then(responseBody)
 };
 
-
 module.exports = {
 	requests,
 	setToken: _token => { token = _token; }
