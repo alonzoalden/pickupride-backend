@@ -8,13 +8,6 @@ var http = require('../../agent.js');
 var keys = require('../../env-config.js');
 const _ = require('underscore');
 const polyline = require('polyline');
- 
-// returns an array of lat, lon pairs 
-// polyline.decode('_p~iF~ps|U_ulLnnqC_mqNvxq`@');
- 
-// // returns a string-encoded polyline 
-//polyline.encode([[38.5, -120.2], [40.7, -120.95], [43.252, -126.453]]);
- 
 
 //retrieve user info
 router.get('/user/:authAccessToken', auth, function(req, res, next){
@@ -45,6 +38,25 @@ router.get('/user/routes/:id', auth, function(req, res, next) {
   	});
 });
 
+//return auth email
+router.get('/user/authEmail/:authAccessToken', function(req, res, next) {
+	const user = {
+		firstname: "",
+		auth_email: ""
+	};
+
+	http.setToken(req.params.authAccessToken);
+	http.requests.get(`${keys.AUTH0_DOMAIN}/userinfo`)
+		.then((authResponse) => {
+			user.firstname = authResponse.email;
+			user.auth_email = authResponse.email;
+			res.json({user: user});
+		})
+		.catch((error)=> {
+			console.log(error);
+		});
+});
+
 //register new user
 router.post('/user/register', function(req, res, next) {
 
@@ -56,16 +68,16 @@ router.post('/user/register', function(req, res, next) {
 
 	http.requests.post('https://www.strava.com/oauth/token', userInfo)
 		.then((stravaResponse)=> {
-			if (!!stravaResponse.athlete.email) {
-				const tempUserInfo = {
-					firstname: authResponse.email
-				}
-				return res.json({user: tempUserInfo});
-			}
-
 			http.setToken(req.body.accessToken);
 			http.requests.get(`${keys.AUTH0_DOMAIN}/userinfo`)
 				.then((authResponse) => {
+					if (!stravaResponse.athlete.email) {
+						const tempUserInfo = {
+							firstname: authResponse.email
+						};
+						return res.json({user: tempUserInfo});
+					}
+
 					let user = new User();
 					user.access_token = stravaResponse.access_token;
 					user.strava_email = stravaResponse.athlete.email;
