@@ -14,6 +14,8 @@ const requests = require('./agent.js').requests;
 const setToken = require('./agent.js').setToken;
 const isProduction = process.env.NODE_ENV === 'production';
 
+
+//Global app object
 const app = express();
 
 app.use(cors());
@@ -26,12 +28,9 @@ app.use(bodyParser.json());
 app.use(require('method-override')());
 app.use(express.static(__dirname + '/dist'));
 
-//app.use(session({ secret: 'pickup', cookie: { maxAge: 60000 }, resave: false, saveUninitialized: false  }));
+app.use(session({ secret: 'pickup', cookie: { maxAge: 60000 }, resave: false, saveUninitialized: false  }));
 
 app.use(jwtCheck);
-// app.get('/authorized', function (req, res) {
-//   res.send('Secured Resource');
-// });
 
 if (!isProduction) {
 	app.use(errorhandler());
@@ -40,12 +39,13 @@ if (!isProduction) {
 if(isProduction){
 	mongoose.connect(process.env.MONGODB_URI);
 } else {
-	mongoose.connect('mongodb://' + key.DB_USERNAME + ':' + key.DB_PASSWORD + key.DB_URL);
+	mongoose.connect(`mongodb://${key.DB_USERNAME}:${key.DB_PASSWORD}${key.DB_URL}`);
 	mongoose.set('debug', true);
 }
 
 require('./models/User');
 require('./config/passport');
+
 app.use(require('./routes'));
 
 /// catch 404 and forward to error handler
@@ -82,6 +82,7 @@ app.use(function(err, req, res, next) {
 	}});
 });
 
+//starting server
 app.listen(3000, function () {
 	console.log('DEV server listening on port 3000!');
 });
