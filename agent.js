@@ -1,6 +1,5 @@
 const superagentPromise = require('superagent-promise');
 const _superagent = require('superagent');
-const key = require('./env-config.js');
 
 const superagent = superagentPromise(_superagent, global.Promise);
 
