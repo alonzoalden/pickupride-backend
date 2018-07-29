@@ -7,18 +7,17 @@ var axios = require('axios');
 var http = require('../../agent.js');
 var keys = require('../../env-config.js');
 const _ = require('underscore');
-const polyline = require('polyline');
 
 //retrieve user info
-router.get('/user/:authAccessToken', auth, function(req, res, next){
-	http.setToken(req.params.authAccessToken);
-	http.requests.get(`${keys.AUTH0_DOMAIN}/userinfo`)
-		.then((response) => {
-			User.findOne({ 'auth_email': response.email }, function (err, person) {
-				if (err) return console.log(err);
-				return res.json({user: person});
-			});
-  		});
+router.get('/user/:authAccessToken', auth, async (req, res, next) => {
+	var response = await http
+		.setToken(req.params.authAccessToken)
+		.requests.get(`${keys.AUTH0_DOMAIN}/userinfo`);
+
+	await User.findOne({ 'auth_email': response.email }, async function (err, person) {
+		if (err) return console.log(err);
+		return res.json({user: person});
+  	});
 });
 
 //retreive routes for leads
@@ -29,10 +28,6 @@ router.get('/user/routes/:id', auth, function(req, res, next) {
 		http.setToken(person.access_token);
  		http.requests.get(`https://www.strava.com/api/v3/athletes/${person.strava_id}/routes`)
 		 	.then((routesResponse) => {
-				// routesResponse.forEach(function(route){
-				// 	route.map.polyline = polyline.decode(route.map.summary_polyline);
-				// });
-
 				res.json({routes: routesResponse});
 			});
   	});

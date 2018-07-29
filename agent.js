@@ -27,5 +27,8 @@ const requests = {
 
 module.exports = {
 	requests,
-	setToken: _token => { token = _token; }
+	setToken: _token => {
+		{ token = _token; }
+		return requests;
+	}
 }
