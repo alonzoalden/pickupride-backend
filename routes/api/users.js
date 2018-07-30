@@ -68,7 +68,7 @@ router.post('/user/register', async (req, res) => {
 		const stravaResponse = await http
 			.requests.post('https://www.strava.com/oauth/token', userInfo)
 		
-		const authResponse	= await http
+		const authResponse = await http
 			.setToken(req.body.accessToken)
 			.requests.get(`${keys.AUTH0_DOMAIN}/userinfo`)
 		
