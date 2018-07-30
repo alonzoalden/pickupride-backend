@@ -17,8 +17,9 @@ const tokenSetup = token => tokenPlugin;
 const requests = {
 	del: url =>
 		superagent.del(`${url}`).use(tokenPlugin).then(responseBody),
-	get: (url, token) =>
-		superagent.get(`${url}`).use(tokenPlugin).then(responseBody),
+	get: (url) => {
+		superagent.get(`${url}`).use(tokenPlugin).then(responseBody)
+	},
 	put: (url, body) =>
 		superagent.put(`${url}`, body).use(tokenPlugin).then(responseBody),
 	post: (url, body) =>

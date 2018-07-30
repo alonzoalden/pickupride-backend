@@ -1,8 +1,7 @@
-const key = require('../env-config.js');
 const jwt = require('express-jwt');
 const jwks = require('jwks-rsa');
-const secret = require('../config').secret;
 
+//Auth0 JWT validator
 const jwtCheck = jwt({
     secret: jwks.expressJwtSecret({
         cache: true,
