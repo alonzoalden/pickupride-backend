@@ -1,6 +1,5 @@
 const superagentPromise = require('superagent-promise');
 const _superagent = require('superagent');
-const key = require('./env-config.js');
 
 const superagent = superagentPromise(_superagent, global.Promise);
 
@@ -18,7 +17,7 @@ const tokenSetup = token => tokenPlugin;
 const requests = {
 	del: url =>
 		superagent.del(`${url}`).use(tokenPlugin).then(responseBody),
-	get: (url, token) =>
+	get: (url) => 
 		superagent.get(`${url}`).use(tokenPlugin).then(responseBody),
 	put: (url, body) =>
 		superagent.put(`${url}`, body).use(tokenPlugin).then(responseBody),
@@ -28,5 +27,8 @@ const requests = {
 
 module.exports = {
 	requests,
-	setToken: _token => { token = _token; }
+	setToken: _token => {
+		{ token = _token; }
+		return { requests: requests };
+	}
 }

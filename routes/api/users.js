@@ -1,113 +1,107 @@
-var mongoose = require('mongoose');
-var router = require('express').Router();
-var passport = require('passport');
-var User = mongoose.model('User');
-var auth = require('../auth');
-var axios = require('axios');
-var http = require('../../agent.js');
-var keys = require('../../env-config.js');
+const mongoose = require('mongoose');
+const router = require('express').Router();
+const passport = require('passport');
+const User = mongoose.model('User');
+const Auth = require('../auth');
+const Http = require('../../agent.js');
+const keys = require('../../env-config.js');
 const _ = require('underscore');
-const polyline = require('polyline');
 
 //retrieve user info
-router.get('/user/:authAccessToken', auth, function(req, res, next){
-	http.setToken(req.params.authAccessToken);
-	http.requests.get(`${keys.AUTH0_DOMAIN}/userinfo`)
-		.then((response) => {
-			User.findOne({ 'auth_email': response.email }, function (err, person) {
+router.get('/user/:authAccessToken', Auth, async (req, res, next) => {
+	try {
+		const response = await Http
+			.setToken(req.params.authAccessToken)
+			.requests.get(`${keys.AUTH0_DOMAIN}/userinfo`);
+		await User
+			.findOne({ 'auth_email': response.email }, (err, person) => {
 				if (err) return console.log(err);
 				return res.json({user: person});
 			});
-  		});
+	}
+	catch(e) {
+		console.log(e);
+	}
 });
 
 //retreive routes for leads
-router.get('/user/routes/:id', auth, function(req, res, next) {
-
-	User.findById(req.params.id, function (err, person) {
-		if (err) return console.log(err);
-		http.setToken(person.access_token);
- 		http.requests.get(`https://www.strava.com/api/v3/athletes/${person.strava_id}/routes`)
-		 	.then((routesResponse) => {
-				// routesResponse.forEach(function(route){
-				// 	route.map.polyline = polyline.decode(route.map.summary_polyline);
-				// });
-
-				res.json({routes: routesResponse});
-			});
-  	});
+router.get('/user/routes/:id', Auth, async (req, res, next) => {
+	try {
+		await User.findById(req.params.id, async (err, person) => {
+			if (err) return console.log(err);
+			const routesResponse = await Http
+				.setToken(person.access_token)
+				.requests.get(`https://www.strava.com/api/v3/athletes/${person.strava_id}/routes`);
+			res.json({routes: routesResponse});
+		});
+	}
+	catch(e) {
+		console.log(e);
+	}
 });
 
 //return auth email
-router.get('/user/authEmail/:authAccessToken', function(req, res, next) {
-	const user = {
-		firstname: "",
-		auth_email: ""
-	};
-
-	http.setToken(req.params.authAccessToken);
-	http.requests.get(`${keys.AUTH0_DOMAIN}/userinfo`)
-		.then((authResponse) => {
-			user.firstname = authResponse.email;
-			user.auth_email = authResponse.email;
-			res.json({user: user});
-		})
-		.catch((error)=> {
-			console.log(error);
-		});
+router.get('/user/authEmail/:authAccessToken', async (req, res, next) => {
+	try {
+		const user = {
+			firstname: '',
+			auth_email: ''
+		};
+		const authResponse = await http
+			.setToken(req.params.authAccessToken)
+			.requests.get(`${keys.AUTH0_DOMAIN}/userinfo`)
+	}
+	catch(e) {
+		console.log(e);
+	}
 });
 
 //register new user
-router.post('/user/register', function(req, res, next) {
+router.post('/user/register', async (req, res) => {
+	try {
+		const userInfo = {
+			client_id: keys.STRAVA_CLIENT_ID,
+			client_secret: keys.STRAVA_CLIENT_SECRET,
+			code: req.body.code,
+		};
 
-	const userInfo = {
-		client_id: keys.STRAVA_CLIENT_ID,
-		client_secret: keys.STRAVA_CLIENT_SECRET,
-		code: req.body.code,
-	};
+		const stravaResponse = await http
+			.requests.post('https://www.strava.com/oauth/token', userInfo)
+		
+		const authResponse = await http
+			.setToken(req.body.accessToken)
+			.requests.get(`${keys.AUTH0_DOMAIN}/userinfo`)
+		
+		if (!stravaResponse.athlete.email) {
+			const tempUserInfo = {
+				firstname: authResponse.email
+			};
+			return res.json({user: tempUserInfo});
+		}
 
-	http.requests.post('https://www.strava.com/oauth/token', userInfo)
-		.then((stravaResponse)=> {
-			http.setToken(req.body.accessToken);
-			http.requests.get(`${keys.AUTH0_DOMAIN}/userinfo`)
-				.then((authResponse) => {
-					if (!stravaResponse.athlete.email) {
-						const tempUserInfo = {
-							firstname: authResponse.email
-						};
-						return res.json({user: tempUserInfo});
-					}
+		let user = new User();
+		user.access_token = stravaResponse.access_token;
+		user.strava_email = stravaResponse.athlete.email;
+		user.auth_email = authResponse.email;
+		user.strava_id = stravaResponse.athlete.id;
+		user.firstname = stravaResponse.athlete.firstname;
+		user.lastname = stravaResponse.athlete.lastname;
+		user.profile_medium = stravaResponse.athlete.profile_medium;
+		user.profile = stravaResponse.athlete.profile;
+		user.city = stravaResponse.athlete.city;
+		user.state = stravaResponse.athlete.state;
+		user.country = stravaResponse.athlete.country;
+		user.sex = stravaResponse.athlete.sex;
+		user.created_at = stravaResponse.athlete.created_at;
+		user.updated_at = stravaResponse.athlete.updated_at;
 
-					let user = new User();
-					user.access_token = stravaResponse.access_token;
-					user.strava_email = stravaResponse.athlete.email;
-					user.auth_email = authResponse.email;
-					user.strava_id = stravaResponse.athlete.id;
-					user.firstname = stravaResponse.athlete.firstname;
-					user.lastname = stravaResponse.athlete.lastname;
-					user.profile_medium = stravaResponse.athlete.profile_medium;
-					user.profile = stravaResponse.athlete.profile;
-					user.city = stravaResponse.athlete.city;
-					user.state = stravaResponse.athlete.state;
-					user.country = stravaResponse.athlete.country;
-					user.sex = stravaResponse.athlete.sex;
-					user.created_at = stravaResponse.athlete.created_at;
-					user.updated_at = stravaResponse.athlete.updated_at;
-
-					user.save()
-						.then(() => {
-							delete user.access_token;
-							res.json({user: user.toObject()});
-                    	})
-                    .catch(next);
-				});
-
-		})
-		.catch((error)=> {
-			console.log(error);
-		});
-
+		await user.save()
+		delete user.access_token;
+		res.json({user: user.toObject()});
+	}
+	catch(e) {
+		console.log(e);
+	}
 });
-
 
 module.exports = router;
