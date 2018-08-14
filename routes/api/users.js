@@ -8,7 +8,7 @@ const keys = require('../../env-config.js');
 const _ = require('underscore');
 
 //retrieve user info
-router.get('/user/:authAccessToken', Auth, async (req, res, next) => {
+router.get('/user/:authAccessToken', async (req, res, next) => {
 	try {
 		const response = await Http
 			.setToken(req.params.authAccessToken)
