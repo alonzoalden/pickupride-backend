@@ -23,7 +23,7 @@ router.get('/user/:authAccessToken', async (req, res, next) => {
 
 //retreive routes for leads
 router.get('/user/routes/:id', async (req, res, next) => {
-	try {
+    try {
         const dbResponse = await db.query(
             `SELECT access_token FROM users WHERE firstname = $1`,
             [req.params.id]
@@ -42,7 +42,7 @@ router.get('/user/routes/:id', async (req, res, next) => {
 
 //register new user
 router.post('/user/register', async (req, res) => {
-	try {
+    try {
         const userInfo = {
             client_id: keys.STRAVA_CLIENT_ID,
             client_secret: keys.STRAVA_CLIENT_SECRET,
