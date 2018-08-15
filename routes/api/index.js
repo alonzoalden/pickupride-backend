@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const isSQL = process.argv.slice(2)[0].toLowerCase() === 'sql';
+const isSQL = process.argv.slice(2)[0] === 'sql';
 
 if (isSQL) {
 	router.use('/', require('./users-sql'));

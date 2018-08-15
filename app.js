@@ -13,7 +13,7 @@ const key = require('./env-config.js');
 const requests = require('./agent.js').requests;
 const setToken = require('./agent.js').setToken;
 const isProduction = process.env.NODE_ENV === 'production';
-const isSQL = process.argv.slice(2)[0].toLowerCase() === 'sql';
+const isSQL = process.argv.slice(2)[0] === 'sql';
 
 //Global app object
 const app = express();
