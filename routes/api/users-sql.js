@@ -4,7 +4,7 @@ const db = require('../../db');
 const keys = require('../../env-config.js');
 
 router.get('/user/:authAccessToken', async (req, res, next) => {
-	try {
+    try {
         const authResponse = await Http
             .setToken(req.params.authAccessToken)
             .requests.get(`${keys.AUTH0_DOMAIN}/userinfo`);
