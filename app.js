@@ -13,7 +13,7 @@ const key = require('./env-config.js');
 const requests = require('./agent.js').requests;
 const setToken = require('./agent.js').setToken;
 const isProduction = process.env.NODE_ENV === 'production';
-
+const isSQL = process.env.DB_TYPE.toLowerCase() === 'sql';
 
 //Global app object
 const app = express();
@@ -30,15 +30,15 @@ app.use(express.static(__dirname + '/dist'));
 
 app.use(session({ secret: 'pickup', cookie: { maxAge: 60000 }, resave: false, saveUninitialized: false  }));
 
-//app.use(jwtCheck);
+app.use(jwtCheck);
 
 if (!isProduction) {
 	app.use(errorhandler());
 }
 
-if(isProduction){
+if(isProduction && !isSQL){
 	mongoose.connect(process.env.MONGODB_URI);
-} else {
+} else if (!isSQL) {
 	mongoose.connect(`mongodb://${key.DB_USERNAME}:${key.DB_PASSWORD}${key.DB_URL}`);
 	mongoose.set('debug', true);
 }
