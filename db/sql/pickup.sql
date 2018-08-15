@@ -1,5 +1,4 @@
 CREATE TABLE Users (
-    "id" varchar(8000) NOT NULL,
     access_token varchar(1000),
     strava_id varchar(1000),
     firstname varchar(100),
@@ -12,6 +11,5 @@ CREATE TABLE Users (
     city varchar(50),
     state varchar(30),
     created_at DATE,
-    updated_at DATE,
-    PRIMARY KEY ("id")
+    updated_at DATE
 );
