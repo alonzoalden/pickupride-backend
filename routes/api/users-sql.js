@@ -6,19 +6,19 @@ const keys = require('../../env-config.js');
 router.get('/user/:authAccessToken', async (req, res, next) => {
 	try {
         const authResponse = await Http
-			.setToken(req.params.authAccessToken)
+            .setToken(req.params.authAccessToken)
             .requests.get(`${keys.AUTH0_DOMAIN}/userinfo`);
             
         const dbResponse = await db.query(
             `SELECT * FROM users WHERE auth_email = $1`,
             [authResponse.email]
-        )        
+        )
         if (dbResponse.err) next(err);
         res.send({user: dbResponse.data.rows[0]});
-	}
-	catch(e) {
-		console.log(e);
-	}
+    }
+    catch(e) {
+        console.log(e);
+    }
 });
 
 //retreive routes for leads
