@@ -35,29 +35,29 @@ router.get('/user/routes/:id', async (req, res, next) => {
                 .requests.get(`https://www.strava.com/api/v3/athletes/${req.params.id}/routes`);
             res.json({routes: routesResponse});
         }
-	catch(e) {
-		console.log(e);
-	}
+    catch(e) {
+        console.log(e);
+    }
 });
 
 //register new user
 router.post('/user/register', async (req, res) => {
 	try {
-		const userInfo = {
-			client_id: keys.STRAVA_CLIENT_ID,
-			client_secret: keys.STRAVA_CLIENT_SECRET,
-			code: req.body.code,
-		};
+        const userInfo = {
+            client_id: keys.STRAVA_CLIENT_ID,
+            client_secret: keys.STRAVA_CLIENT_SECRET,
+            code: req.body.code,
+        };
 
-		const stravaResponse = await http
-			.requests.post('https://www.strava.com/oauth/token', userInfo)
+        const stravaResponse = await http
+            .requests.post('https://www.strava.com/oauth/token', userInfo)
 		
-		const authResponse = await http
-			.setToken(req.body.accessToken)
-			.requests.get(`${keys.AUTH0_DOMAIN}/userinfo`)
+        const authResponse = await http
+            .setToken(req.body.accessToken)
+            .requests.get(`${keys.AUTH0_DOMAIN}/userinfo`)
         
         //if user is not registered with strava, return auth0 email
-		if (!stravaResponse.athlete.email) return res.json({user: {firstname: authResponse.email}});
+        if (!stravaResponse.athlete.email) return res.json({user: {firstname: authResponse.email}});
 
         const dbResponse = await db.query(
             `INSERT INTO users (access_token, strava_email, auth_email
@@ -84,10 +84,10 @@ router.post('/user/register', async (req, res) => {
             ])
         if (dbResponse.err) next(err);
         res.send({user: dbResponse.data.rows[0]});
-	}
-	catch(e) {
-		console.log(e);
-	}
+    }
+    catch(e) {
+        console.log(e);
+    }
 });
 
 
