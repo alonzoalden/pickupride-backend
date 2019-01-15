@@ -39,7 +39,7 @@ if (!isProduction) {
 if(isProduction && !isSQL){
 	mongoose.connect(process.env.MONGODB_URI);
 } else if (!isSQL) {
-	mongoose.connect(`mongodb://${key.DB_USERNAME}:${key.DB_PASSWORD}${key.DB_URL}`);
+	mongoose.connect(`mongodb://${key.DB_USERNAME}:${key.DB_PASSWORD}${key.DB_URL}`, { useNewUrlParser: true });
 	mongoose.set('debug', true);
 }
 
