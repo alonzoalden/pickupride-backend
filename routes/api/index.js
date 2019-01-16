@@ -1,11 +1,9 @@
 const router = require('express').Router();
 const isSQL = process.argv.slice(2)[0] === 'sql';
 
-if (isSQL) {
-	router.use('/', require('./users-sql'));
-} else {
-	router.use('/', require('./users'));
-}
+isSQL
+	? router.use('/', require('./users-sql'))
+	: router.use('/', require('./users'));
 
 router.use(function(err, req, res, next){
 	if(err.name === 'ValidationError'){
