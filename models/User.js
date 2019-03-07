@@ -10,7 +10,7 @@ var UserSchema = new mongoose.Schema({
 	firstname: {type: String, match: [/^[a-zA-Z0-9]+$/, 'is invalid']},
 	lastname: {type: String,  match: [/^[a-zA-Z0-9]+$/, 'is invalid']},
 	auth_email: {type: String, lowercase: true, required: [true, "can't be blank"], match: [/\S+@\S+\.\S+/, 'is invalid']},
-	strava_email: {type: String, lowercase: true, required: [true, "can't be blank"], match: [/\S+@\S+\.\S+/, 'is invalid']},
+	// strava_email: {type: String, lowercase: true, required: [true, "can't be blank"], match: [/\S+@\S+\.\S+/, 'is invalid']},
 	profile_medium: String,
 	profile: String,
 	sex: String,
