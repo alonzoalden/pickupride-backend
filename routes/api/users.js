@@ -17,7 +17,7 @@ router.get('/user/:authAccessToken', async (req, res, next) => {
 		// const response = await Http
 		// 	.setToken(req.params.authAccessToken)
 		// 	.requests.get(`${keys.AUTH0_DOMAIN}/userinfo`);
-		const response = await axios.get(`https://${keys.AUTH0_DOMAIN}/userinfo`, headers(req.params.authAccessToken));
+		const response = await axios.get(`https://alonzoalden.auth0.com/userinfo`, headers(req.params.authAccessToken));
 		
 		await User
 			.findOne({ 'auth_email': response.data.email }, (err, person) => {
@@ -77,7 +77,7 @@ router.post('/user/register', async (req, res) => {
 		
 		if (!stravaResponse.data.athlete.lastname && !stravaResponse.data.athlete.lastname) {
 			const tempUserInfo = {
-				firstname: authResponse.email
+				firstname: authResponse.data.email || authResponse.data.sub
 			};
 			return res.json({user: tempUserInfo});
 		}
