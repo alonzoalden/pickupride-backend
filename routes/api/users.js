@@ -4,16 +4,23 @@ const User = mongoose.model('User');
 const Auth = require('../auth');
 const Http = require('../../agent.js');
 const keys = require('../../env-config.js');
-const _ = require('underscore');
+const axios = require('axios');
+
+
+const headers = (token) => {
+	return { headers: { 'Authorization' : 'Bearer ' + token }};
+}
 
 //retrieve user info
 router.get('/user/:authAccessToken', async (req, res, next) => {
 	try {
-		const response = await Http
-			.setToken(req.params.authAccessToken)
-			.requests.get(`${keys.AUTH0_DOMAIN}/userinfo`);
+		// const response = await Http
+		// 	.setToken(req.params.authAccessToken)
+		// 	.requests.get(`${keys.AUTH0_DOMAIN}/userinfo`);
+		const response = await axios.get(`https://${keys.AUTH0_DOMAIN}/userinfo`, headers(req.params.authAccessToken));
+		
 		await User
-			.findOne({ 'auth_email': response.email }, (err, person) => {
+			.findOne({ 'auth_email': response.data.email }, (err, person) => {
 				if (err) return console.log(err);
 				return res.json({user: person});
 			});
@@ -64,14 +71,11 @@ router.post('/user/register', async (req, res) => {
 			code: req.body.code,
 		};
 
-		const stravaResponse = await http
-			.requests.post('https://www.strava.com/oauth/token', userInfo)
+
+		const stravaResponse = await axios.post('https://www.strava.com/oauth/token', userInfo)
+		const authResponse = await axios.get(`https://${keys.AUTH0_DOMAIN}/userinfo`, headers(req.body.accessToken))
 		
-		const authResponse = await http
-			.setToken(req.body.accessToken)
-			.requests.get(`${keys.AUTH0_DOMAIN}/userinfo`)
-		
-		if (!stravaResponse.athlete.email) {
+		if (!stravaResponse.data.athlete.lastname && !stravaResponse.data.athlete.lastname) {
 			const tempUserInfo = {
 				firstname: authResponse.email
 			};
@@ -79,27 +83,29 @@ router.post('/user/register', async (req, res) => {
 		}
 
 		let user = new User();
-		user.access_token = stravaResponse.access_token;
-		user.strava_email = stravaResponse.athlete.email;
-		user.auth_email = authResponse.email;
-		user.strava_id = stravaResponse.athlete.id;
-		user.firstname = stravaResponse.athlete.firstname;
-		user.lastname = stravaResponse.athlete.lastname;
-		user.profile_medium = stravaResponse.athlete.profile_medium;
-		user.profile = stravaResponse.athlete.profile;
-		user.city = stravaResponse.athlete.city;
-		user.state = stravaResponse.athlete.state;
-		user.country = stravaResponse.athlete.country;
-		user.sex = stravaResponse.athlete.sex;
-		user.created_at = stravaResponse.athlete.created_at;
-		user.updated_at = stravaResponse.athlete.updated_at;
+		user.access_token = stravaResponse.data.access_token;
+		// user.strava_email = stravaResponse.data.athlete.email;
+		user.auth_email = authResponse.data.email;
+		user.strava_id = stravaResponse.data.athlete.id;
+		user.firstname = stravaResponse.data.athlete.firstname;
+		user.lastname = stravaResponse.data.athlete.lastname;
+		user.profile_medium = stravaResponse.data.athlete.profile_medium;
+		user.profile = stravaResponse.data.athlete.profile;
+		user.city = stravaResponse.data.athlete.city;
+		user.state = stravaResponse.data.athlete.state;
+		user.country = stravaResponse.data.athlete.country;
+		user.sex = stravaResponse.data.athlete.sex;
+		user.created_at = stravaResponse.data.athlete.created_at;
+		user.updated_at = stravaResponse.data.athlete.updated_at;
 
 		await user.save()
 		delete user.access_token;
+
 		res.json({user: user.toObject()});
 	}
 	catch(e) {
 		console.log(e);
+		res.json(500, {error: e});
 	}
 });
 
