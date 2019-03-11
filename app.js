@@ -44,8 +44,10 @@ if(isProduction && !isSQL){
 }
 
 require('./models/User');
-require('./config/passport');
+require('./models/Route');
+require('./models/Ride');
 
+require('./config/passport');
 app.use(require('./routes'));
 
 /// catch 404 and forward to error handler

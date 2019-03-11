@@ -24,4 +24,4 @@ var RouteSchema = new mongoose.Schema({
     updated_at: String,
 }, {timestamps: true});
 
-mongoose.model('User', RouteSchema);
+mongoose.model('Route', RouteSchema);

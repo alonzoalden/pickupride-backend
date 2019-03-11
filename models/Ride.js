@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 
 var RideSchema = new mongoose.Schema({
+    type: {type: String, required: [true, "can't be blank"]},
 	title: {type: String, required: [true, "can't be blank"]},
 	pace: {type: String, required: [true, "can't be blank"]},
 	date: {type: String, required: [true, "can't be blank"]},
@@ -9,4 +10,4 @@ var RideSchema = new mongoose.Schema({
     route_id: {type: Number, required: [true, "can't be blank"]},
 }, {timestamps: true});
 
-mongoose.model('User', RideSchema);
+mongoose.model('Ride', RideSchema);
