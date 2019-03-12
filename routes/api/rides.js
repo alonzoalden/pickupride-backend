@@ -26,15 +26,15 @@ router.post('/lead', async (req, res) => {
 		ride.date = req.body.date;
 		ride.time = req.body.time;
 		ride.info = req.body.info;
-		ride.route_id = req.body.route.route_id
+		ride.route_id = req.body.route.id;
 		
+		route.id = req.body.route.id;
 		route.athlete = req.body.route.athlete;
-		route.created_at = req.body.route.created_at
-		route.description = req.body.route.description
-		route.distance = req.body.route.distance
-		route.elevation_gain = req.body.route.elevation_gain
-		route.estimated_moving_time = req.body.route.estimated_moving_time
-		route.id = req.body.route.estimated_moving_time;
+		route.created_at = req.body.route.created_at;
+		route.description = req.body.route.description;
+		route.distance = req.body.route.distance;
+		route.elevation_gain = req.body.route.elevation_gain;
+		route.estimated_moving_time = req.body.route.estimated_moving_time;
 		route.map =  req.body.route.map;
 		route.name = req.body.route.name;
 		route.private = req.body.route.private;
@@ -48,12 +48,18 @@ router.post('/lead', async (req, res) => {
 		await ride.save()
 		await route.save()
 
-		res.json({user: user.toObject()});
+		res.json({ 
+			data: {
+				route: route.toObject(),
+				ride: ride.toObject(),
+			}
+		});
 	}
-	catch(e) {
-		console.log(e);
-		res.json(500, {error: e});
+	catch(err) {
+		console.log(err);
+		res.json(500, {error: err});
+		
 	}
-});
+}).req;
 
 module.exports = router;
