@@ -53,7 +53,7 @@ router.get('/user/authEmail/:authAccessToken', async (req, res, next) => {
 			firstname: '',
 			auth_email: ''
 		};
-		const authResponse = await http
+		const authResponse = await Http
 			.setToken(req.params.authAccessToken)
 			.requests.get(`${keys.AUTH0_DOMAIN}/userinfo`)
 	}
@@ -68,12 +68,12 @@ router.post('/user/register', async (req, res) => {
 		const userInfo = {
 			client_id: keys.STRAVA_CLIENT_ID,
 			client_secret: keys.STRAVA_CLIENT_SECRET,
-			code: req.body.code,
+			code: req.body.code
 		};
 
 
 		const stravaResponse = await axios.post('https://www.strava.com/oauth/token', userInfo)
-		const authResponse = await axios.get(`https://${keys.AUTH0_DOMAIN}/userinfo`, headers(req.body.accessToken))
+		const authResponse = await axios.get(`https://alonzoalden.auth0.com/userinfo`, headers(req.body.accessToken))
 		
 		if (!stravaResponse.data.athlete.lastname && !stravaResponse.data.athlete.lastname) {
 			const tempUserInfo = {

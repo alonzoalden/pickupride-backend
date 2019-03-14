@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const router = require('express').Router();
 const User = mongoose.model('User');
 const Route = mongoose.model('Route');
-const Ride = mongoose.model('Ride');
+const Listing = mongoose.model('Listing');
 const Auth = require('../auth');
 const Http = require('../../agent.js');
 const keys = require('../../env-config.js');
@@ -13,21 +13,36 @@ const headers = (token) => {
 	return { headers: { 'Authorization' : 'Bearer ' + token }};
 }
 
+//retreive listings/rides
+router.get('/listings', Auth, async (req, res, next) => {
+	try {
+		await Listing.find({})
+		.populate('route')
+		.exec(function (err, listings) {
+			if (err) return console.log(err);
+			res.send(listings);
+		});
+	}
+	catch(e) {
+		console.log(e);
+	}
+});
+
 //post new ride listing
 router.post('/lead', async (req, res) => {
 	try {
 
-		let ride = new Ride();
+		let listing = new Listing();
 		let route = new Route();
 
-		ride.type = req.body.type;
-		ride.title = req.body.title;
-		ride.pace = req.body.pace;
-		ride.date = req.body.date;
-		ride.time = req.body.time;
-		ride.info = req.body.info;
-		ride.route_id = req.body.route.id;
-		
+		listing.type = req.body.type;
+		listing.title = req.body.title;
+		listing.pace = req.body.pace;
+		listing.date = req.body.date;
+		listing.time = req.body.time;
+		listing.info = req.body.info;
+		listing.route_id = req.body.route.id;
+
 		route.id = req.body.route.id;
 		route.athlete = req.body.route.athlete;
 		route.created_at = req.body.route.created_at;
@@ -44,21 +59,22 @@ router.post('/lead', async (req, res) => {
 		route.timestamp = req.body.route.timestamp;
 		route.type = req.body.route.type;
 		route.updated_at = req.body.route.updated_at;
-		
-		await ride.save()
-		await route.save()
 
-		res.json({ 
-			data: {
-				route: route.toObject(),
-				ride: ride.toObject(),
-			}
+		await route.save();
+		listing.route = route._id;
+		console.log(route, listing)
+		await listing.save();
+
+		let listingObject = listing.toObject();
+		listingObject.route = route.id;
+		res.json({
+			listing: listingObject
 		});
 	}
 	catch(err) {
 		console.log(err);
 		res.json(500, {error: err});
-		
+
 	}
 }).req;
 
