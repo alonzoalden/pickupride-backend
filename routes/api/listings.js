@@ -7,6 +7,7 @@ const Auth = require('../auth');
 const Http = require('../../agent.js');
 const keys = require('../../env-config.js');
 const axios = require('axios');
+const jwtCheck = require('../auth');
 
 
 const headers = (token) => {
@@ -14,7 +15,7 @@ const headers = (token) => {
 }
 
 //retreive listings/rides
-router.get('/listings', Auth, async (req, res, next) => {
+router.get('/listings', async (req, res, next) => {
 	try {
 		await Listing.find({})
 		.populate('route')
@@ -29,7 +30,7 @@ router.get('/listings', Auth, async (req, res, next) => {
 });
 
 //post new ride listing
-router.post('/lead', async (req, res) => {
+router.post('/lead', jwtCheck, async (req, res) => {
 	try {
 
 		let listing = new Listing();
@@ -42,7 +43,9 @@ router.post('/lead', async (req, res) => {
 		listing.time = req.body.time;
 		listing.info = req.body.info;
 		listing.route_id = req.body.route.id;
-
+		listing.creator_photo = req.body.creator_photo;
+		listing.creator = req.body.creator;
+		
 		route.id = req.body.route.id;
 		route.athlete = req.body.route.athlete;
 		route.created_at = req.body.route.created_at;
@@ -62,7 +65,7 @@ router.post('/lead', async (req, res) => {
 
 		await route.save();
 		listing.route = route._id;
-		console.log(route, listing)
+		
 		await listing.save();
 
 		let listingObject = listing.toObject();

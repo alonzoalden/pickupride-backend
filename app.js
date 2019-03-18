@@ -30,7 +30,7 @@ app.use(express.static(__dirname + '/dist'));
 
 app.use(session({ secret: 'pickup', cookie: { maxAge: 60000 }, resave: false, saveUninitialized: false  }));
 
-app.use(jwtCheck);
+// app.use(jwtCheck);
 
 if (!isProduction) {
 	app.use(errorhandler());

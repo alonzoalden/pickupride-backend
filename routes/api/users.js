@@ -97,7 +97,7 @@ router.post('/user/register', async (req, res) => {
 		user.sex = stravaResponse.data.athlete.sex;
 		user.created_at = stravaResponse.data.athlete.created_at;
 		user.updated_at = stravaResponse.data.athlete.updated_at;
-
+		
 		await user.save()
 		delete user.access_token;
 
