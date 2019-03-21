@@ -4,11 +4,11 @@ const User = mongoose.model('User');
 const Route = mongoose.model('Route');
 const Listing = mongoose.model('Listing');
 const ListingMember = mongoose.model('ListingMember');
-const Auth = require('../auth');
+const jwtCheck = require('../auth');
 const Http = require('../../agent.js');
 const keys = require('../../env-config.js');
 const axios = require('axios');
-const jwtCheck = require('../auth');
+
 
 
 const headers = (token) => {
@@ -20,6 +20,7 @@ router.get('/listings', async (req, res, next) => {
 	try {
 		await Listing.find({})
 		.populate('route')
+		.populate('members')
 		.exec(function (err, listings) {
 			if (err) return console.log(err);
 			res.send(listings);
@@ -36,23 +37,32 @@ router.post('/lead/addMember', jwtCheck, async (req, res) => {
 
 		let listingMember = new ListingMember();
 
-		listingMember.firstname = req.body.firstname
-		listingMember.lastname = req.body.lastname
-		listingMember.profile_photo = req.body.profile_photo
-		listingMember.location = req.body.location
-		//listingMember.listing_id = req.body.listing_id
+		listingMember.firstname = req.body.firstname;
+		listingMember.lastname = req.body.lastname;
+		listingMember.profile_photo = req.body.profile_photo;
+		listingMember.location = req.body.location;
+		listingMember.listing_id = req.body.listing_id;
 		
+		await listingMember.save();
+		
+		await Listing.findById(req.body.listing_id)
+			.exec(function (err, listing) {
+				if (err) return console.log(err);
+				listing.members.push(listingMember._id);
+				listing.save();
+
+				res.send(listingMember);
+			});
+
 		//find listing with req.body.listing_id
 		//update listing groupMembersList array with listingMember
 		//save listing
 
-		await listingMember.save();
+		// let listingObject = listingMember.toObject();
 
-		let listingObject = listingMember.toObject();
-
-		res.json({
-			listing: listingObject
-		});
+		// res.json({
+		// 	listing: listingObject
+		// });
 	}
 	catch(err) {
 		console.log(err);
@@ -101,7 +111,7 @@ router.post('/lead', jwtCheck, async (req, res) => {
 		await listing.save();
 
 		let listingObject = listing.toObject();
-		listingObject.route = route.id;
+		
 		res.json({
 			listing: listingObject
 		});
