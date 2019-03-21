@@ -46,6 +46,7 @@ if(isProduction && !isSQL){
 require('./models/User');
 require('./models/Route');
 require('./models/Listing');
+require('./models/ListingMember');
 
 require('./config/passport');
 app.use(require('./routes'));

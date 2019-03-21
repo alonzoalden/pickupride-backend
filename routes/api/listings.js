@@ -3,6 +3,7 @@ const router = require('express').Router();
 const User = mongoose.model('User');
 const Route = mongoose.model('Route');
 const Listing = mongoose.model('Listing');
+const ListingMember = mongoose.model('ListingMember');
 const Auth = require('../auth');
 const Http = require('../../agent.js');
 const keys = require('../../env-config.js');
@@ -28,6 +29,37 @@ router.get('/listings', async (req, res, next) => {
 		console.log(e);
 	}
 });
+
+//post new ride listing
+router.post('/lead/addMember', jwtCheck, async (req, res) => {
+	try {
+
+		let listingMember = new ListingMember();
+
+		listingMember.firstname = req.body.firstname
+		listingMember.lastname = req.body.lastname
+		listingMember.profile_photo = req.body.profile_photo
+		listingMember.location = req.body.location
+		//listingMember.listing_id = req.body.listing_id
+		
+		//find listing with req.body.listing_id
+		//update listing groupMembersList array with listingMember
+		//save listing
+
+		await listingMember.save();
+
+		let listingObject = listingMember.toObject();
+
+		res.json({
+			listing: listingObject
+		});
+	}
+	catch(err) {
+		console.log(err);
+		res.json(500, {error: err});
+
+	}
+}).req;
 
 //post new ride listing
 router.post('/lead', jwtCheck, async (req, res) => {
@@ -80,5 +112,6 @@ router.post('/lead', jwtCheck, async (req, res) => {
 
 	}
 }).req;
+
 
 module.exports = router;
