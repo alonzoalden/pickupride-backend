@@ -42,6 +42,7 @@ router.post('/lead/addMember', jwtCheck, async (req, res) => {
 		listingMember.profile_photo = req.body.profile_photo;
 		listingMember.location = req.body.location;
 		listingMember.listing_id = req.body.listing_id;
+		listingMember.user_id = req.body.user_id;
 		
 		await listingMember.save();
 		

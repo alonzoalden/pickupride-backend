@@ -5,7 +5,8 @@ var ListingMemberSchema = new mongoose.Schema({
 	lastname: String,
     profile_photo: String,
     location: String,
-	listing_id: {type: String, required: [true, "can't be blank"]},
+    listing_id: {type: String, required: [true, "can't be blank"]},
+    user_id: {type: String, required: [true, "can't be blank"]},
 }, {timestamps: true});
 
 mongoose.model('ListingMember', ListingMemberSchema);
