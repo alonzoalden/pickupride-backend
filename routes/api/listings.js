@@ -72,6 +72,18 @@ router.post('/lead/addMember', jwtCheck, async (req, res) => {
 	}
 }).req;
 
+router.delete('/listing/remove/:id', jwtCheck, async (req, res) => {
+	try {
+		Listing
+			.deleteOne({_id: req.params.id}, function(err, listing) {
+				res.send(listing);
+			})
+	}
+	catch(e) {
+		console.log(e);
+	}
+})
+
 //post new ride listing
 router.post('/lead', jwtCheck, async (req, res) => {
 	try {
