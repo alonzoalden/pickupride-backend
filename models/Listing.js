@@ -7,8 +7,9 @@ var ListingSchema = new mongoose.Schema({
 	date: {type: String, required: [true, "can't be blank"]},
 	time: {type: String, required: [true, "can't be blank"]},
     info: String,
-	route: {type: mongoose.Schema.Types.ObjectId, ref: 'Route'},
+	route: {type: mongoose.Schema.Types.ObjectId, ref: 'Route', required: [true, "can't be blank"]},
 	creator: {type: String, required: [true, "can't be blank"]},
+	creator_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Route', required: [true, "can't be blank"]},
 	creator_photo: {type: String, required: [true, "can't be blank"]},
 	members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ListingMember' }],
 }, {timestamps: true});

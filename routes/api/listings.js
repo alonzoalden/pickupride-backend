@@ -98,9 +98,10 @@ router.post('/lead', jwtCheck, async (req, res) => {
 		listing.time = req.body.time;
 		listing.info = req.body.info;
 		listing.route_id = req.body.route.id;
-		listing.creator_photo = req.body.creator_photo;
 		listing.creator = req.body.creator;
-		
+		listing.creator_id = req.body.creator_id;
+		listing.creator_photo = req.body.creator_photo;
+
 		route.id = req.body.route.id;
 		route.athlete = req.body.route.athlete;
 		route.created_at = req.body.route.created_at;
