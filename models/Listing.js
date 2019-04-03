@@ -11,7 +11,7 @@ var ListingSchema = new mongoose.Schema({
 	creator: {type: String, required: [true, "can't be blank"]},
 	creator_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Route', required: [true, "can't be blank"]},
 	creator_photo: {type: String, required: [true, "can't be blank"]},
-	members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ListingMember' }],
+	members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 }, {timestamps: true});
 
 mongoose.model('Listing', ListingSchema);
