@@ -62,20 +62,12 @@ router.post('/listing/:listingid/addMember/:userid', jwtCheck, async (req, res) 
 //remove group member from listing
 router.delete('/listing/:listingid/removeMember/:memberid', jwtCheck, async (req, res) => {
 	try {
-
-		//find listing
-		//go through members array on listing and remove memberid
-		//return listing
-
-
 		Listing.findById(req.params.listingid, function(err, listing) {
-			console.log(listing)
 			listing.members = listing.members.filter(function(member) {
-				console.log(member._id.toString())
 				return member._id.toString() !== req.params.memberid;
 			})
 			listing.save();
-			res.send(listing);
+			res.send(listing.members);
 		})
 	}
 	catch(e) {
