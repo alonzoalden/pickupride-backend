@@ -88,8 +88,9 @@ router.delete('/listing/remove/:id', jwtCheck, async (req, res) => {
 	}
 })
 
+
 //post new ride listing
-router.post('/lead', jwtCheck, async (req, res) => {
+router.post('/listing', jwtCheck, async (req, res) => {
 	try {
 
 		let listing = new Listing();
@@ -133,6 +134,64 @@ router.post('/lead', jwtCheck, async (req, res) => {
 		res.json({
 			listing: listingObject
 		});
+	}
+	catch(err) {
+		console.log(err);
+		res.json(500, {error: err});
+
+	}
+}).req;
+
+
+//edit listing
+router.put('/listing/:listingid', jwtCheck, async (req, res) => {
+	try {
+
+		await Listing.findById(req.params.listingid)
+			.exec(async (err, listing) => {
+				console.log(listing._id.toString())
+				if (err) return console.log(err);
+				listing.type = req.body.type;
+				listing.title = req.body.title;
+				listing.pace = req.body.pace;
+				listing.date = req.body.date;
+				listing.time = req.body.time;
+				listing.info = req.body.info;
+				listing.route_id = req.body.route.id;
+				await listing.save();
+
+				console.log(listing._id.toString())
+				//check if the route exists in the data base before saving it
+				let route = new Route();
+				route.id = req.body.route.id;
+				route.athlete = req.body.route.athlete;
+				route.created_at = req.body.route.created_at;
+				route.description = req.body.route.description;
+				route.distance = req.body.route.distance;
+				route.elevation_gain = req.body.route.elevation_gain;
+				route.estimated_moving_time = req.body.route.estimated_moving_time;
+				route.map =  req.body.route.map;
+				route.name = req.body.route.name;
+				route.private = req.body.route.private;
+				route.resource_state = req.body.route.resource_state;
+				route.starred = req.body.route.starred;
+				route.sub_type = req.body.route.sub_type;
+				route.timestamp = req.body.route.timestamp;
+				route.type = req.body.route.type;
+				route.updated_at = req.body.route.updated_at;
+				await route.save()
+				
+				
+				listing.route = route._id;
+				
+				let listingObject = listing.toObject();
+		
+				res.json({
+					listing: listingObject
+				});
+			});
+
+		
 	}
 	catch(err) {
 		console.log(err);
