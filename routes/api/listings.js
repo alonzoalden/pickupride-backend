@@ -158,9 +158,9 @@ router.put('/listing/:listingid', jwtCheck, async (req, res) => {
 				listing.time = req.body.time;
 				listing.info = req.body.info;
 				listing.route_id = req.body.route.id;
-				await listing.save();
+				
 
-				console.log(listing._id.toString())
+				
 				//check if the route exists in the data base before saving it
 				let route = new Route();
 				route.id = req.body.route.id;
@@ -181,9 +181,8 @@ router.put('/listing/:listingid', jwtCheck, async (req, res) => {
 				route.updated_at = req.body.route.updated_at;
 				await route.save()
 				
-				
 				listing.route = route._id;
-				
+				await listing.save();
 				let listingObject = listing.toObject();
 		
 				res.json({
