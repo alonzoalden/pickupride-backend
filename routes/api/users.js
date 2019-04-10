@@ -12,7 +12,7 @@ const GeocoderOptions = {
 	provider: 'google',
 	// Optional depending on the providers
 	httpAdapter: 'https', // Default
-	apiKey: 'AIzaSyDhcwMfjYqSD4zInqPzvQhln7cGUKGZQtc', // for Mapquest, OpenCage, Google Premier
+	apiKey: keys.GOOGLE_MAPS_KEY, // for Mapquest, OpenCage, Google Premier
 	// formatter: null         // 'gpx', 'string', ...
 };
 const geocoder = NodeGeocoder(GeocoderOptions);
