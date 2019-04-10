@@ -6,7 +6,16 @@ const Http = require('../../agent.js');
 const keys = require('../../env-config.js');
 const axios = require('axios');
 
+const NodeGeocoder = require('node-geocoder');
 
+const GeocoderOptions = {
+	provider: 'google',
+	// Optional depending on the providers
+	httpAdapter: 'https', // Default
+	apiKey: 'AIzaSyDhcwMfjYqSD4zInqPzvQhln7cGUKGZQtc', // for Mapquest, OpenCage, Google Premier
+	// formatter: null         // 'gpx', 'string', ...
+};
+const geocoder = NodeGeocoder(GeocoderOptions);
 const headers = (token) => {
 	return { headers: { 'Authorization' : 'Bearer ' + token }};
 }
@@ -22,6 +31,7 @@ router.get('/user/:authAccessToken', async (req, res, next) => {
 		await User
 			.findOne({ 'auth_email': response.data.email }, (err, person) => {
 				if (err) return console.log(err);
+				
 				return res.json({user: person});
 			});
 	}
@@ -71,7 +81,6 @@ router.post('/user/register', async (req, res) => {
 			code: req.body.code
 		};
 
-
 		const stravaResponse = await axios.post('https://www.strava.com/oauth/token', userInfo)
 		const authResponse = await axios.get(`https://alonzoalden.auth0.com/userinfo`, headers(req.body.accessToken))
 		
@@ -98,6 +107,14 @@ router.post('/user/register', async (req, res) => {
 		user.created_at = stravaResponse.data.athlete.created_at;
 		user.updated_at = stravaResponse.data.athlete.updated_at;
 		
+		await geocoder.geocode(stravaResponse.data.athlete.city
+			+ ", " + stravaResponse.data.athlete.state
+			+ ", " + stravaResponse.data.athlete.country, 
+			( err, data ) => {
+				const locationData = data.raw.results[0].geometry.location;
+				user.location_coords = [locationData.lng, locationData.lat];
+		});
+
 		await user.save()
 		delete user.access_token;
 

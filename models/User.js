@@ -17,6 +17,7 @@ var UserSchema = new mongoose.Schema({
 	city: String,
 	state: String,
 	country: String,
+	location_coords: Array,
 	created_at: String,
 	updated_at: String,
 	favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Article' }],
